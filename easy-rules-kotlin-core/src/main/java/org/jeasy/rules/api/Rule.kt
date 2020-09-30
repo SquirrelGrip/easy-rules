@@ -51,6 +51,16 @@ interface Rule : Comparable<Rule> {
     @Throws(Exception::class)
     fun execute(facts: Facts)
 
+    override fun compareTo(rule: Rule): Int {
+        return if (priority < rule.priority) {
+            -1
+        } else if (priority > rule.priority) {
+            1
+        } else {
+            name.compareTo(rule.name)
+        }
+    }
+
     companion object {
         /**
          * Default rule name.

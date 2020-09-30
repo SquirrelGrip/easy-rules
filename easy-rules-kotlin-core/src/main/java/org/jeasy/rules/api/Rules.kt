@@ -23,7 +23,6 @@
  */
 package org.jeasy.rules.api
 
-import org.jeasy.rules.core.RuleProxy
 import java.util.*
 
 /**
@@ -34,11 +33,6 @@ import java.util.*
  */
 class Rules : Iterable<Rule> {
     private var rules: MutableSet<Rule> = sortedSetOf()
-
-    /**
-     * Create a new [Rules] object.
-     */
-    constructor()
 
     /**
      * Create a new [Rules] object.
@@ -54,17 +48,7 @@ class Rules : Iterable<Rule> {
      *
      * @param rules to register
      */
-    constructor(firstRule: Rule, vararg rules: Rule) {
-        this.rules.add(firstRule)
-        Collections.addAll(this.rules, *rules)
-    }
-
-    /**
-     * Create a new [Rules] object.
-     *
-     * @param rules to register
-     */
-    constructor(vararg rules: Any) {
+    constructor(vararg rules: Rule) {
         register(*rules)
     }
 
@@ -73,9 +57,9 @@ class Rules : Iterable<Rule> {
      *
      * @param rules to register, must not be null
      */
-    fun register(vararg rules: Any) {
+    fun register(vararg rules: Rule) {
         for (rule in rules) {
-            this.rules.add(RuleProxy.asRule(rule))
+            this.rules.add(rule)
         }
     }
 
@@ -84,9 +68,9 @@ class Rules : Iterable<Rule> {
      *
      * @param rules to unregister, must not be null
      */
-    fun unregister(vararg rules: Any) {
+    fun unregister(vararg rules: Rule) {
         for (rule in rules) {
-            this.rules.remove(RuleProxy.Companion.asRule(rule))
+            this.rules.remove(rule)
         }
     }
 

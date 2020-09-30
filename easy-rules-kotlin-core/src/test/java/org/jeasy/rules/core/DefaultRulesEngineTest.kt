@@ -24,10 +24,6 @@
 package org.jeasy.rules.core
 
 import org.assertj.core.api.Assertions
-import org.jeasy.rules.annotation.Action
-import org.jeasy.rules.annotation.Condition
-import org.jeasy.rules.annotation.Priority
-import org.jeasy.rules.api.Rule
 import org.jeasy.rules.api.RuleListener
 import org.jeasy.rules.api.RulesEngineListener
 import org.jeasy.rules.api.RulesEngineParameters
@@ -37,6 +33,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
+import javax.xml.ws.Action
 
 class DefaultRulesEngineTest : AbstractTest() {
     @Mock
@@ -44,7 +41,7 @@ class DefaultRulesEngineTest : AbstractTest() {
     @Mock
     lateinit var rulesEngineListener: RulesEngineListener
 
-    lateinit var annotatedRule: AnnotatedRule
+//    lateinit var annotatedRule: AnnotatedRule
 
     @Before
     @Throws(Exception::class)
@@ -52,7 +49,7 @@ class DefaultRulesEngineTest : AbstractTest() {
         super.setup()
         Mockito.`when`(rule1.name).thenReturn("r")
         Mockito.`when`(rule1.priority).thenReturn(1)
-        annotatedRule = AnnotatedRule()
+//        annotatedRule = AnnotatedRule()
     }
 
     @Test
@@ -120,62 +117,62 @@ class DefaultRulesEngineTest : AbstractTest() {
         inOrder.verify(rule2).evaluate(facts)
     }
 
-    @Test
-    fun actionsMustBeExecutedInTheDefinedOrder() {
-        // Given
-        rules.register(annotatedRule)
+//    @Test
+//    fun actionsMustBeExecutedInTheDefinedOrder() {
+//        // Given
+//        rules.register(annotatedRule)
+//
+//        // When
+//        rulesEngine.fire(rules, facts)
+//
+//        // Then
+//        Assert.assertEquals("012", annotatedRule.getActionSequence())
+//    }
 
-        // When
-        rulesEngine.fire(rules, facts)
+//    @Test
+//    @Throws(Exception::class)
+//    fun annotatedRulesAndNonAnnotatedRulesShouldBeUsableTogether() {
+//        // Given
+//        Mockito.`when`(rule1.evaluate(facts)).thenReturn(true)
+//        rules.register(rule1)
+//        rules.register(annotatedRule)
+//
+//        // When
+//        rulesEngine.fire(rules, facts)
+//
+//        // Then
+//        Mockito.verify(rule1).execute(facts)
+//        Assertions.assertThat(annotatedRule.isExecuted()).isTrue
+//    }
 
-        // Then
-        Assert.assertEquals("012", annotatedRule.getActionSequence())
-    }
+//    @Test
+//    fun whenRuleNameIsNotSpecified_thenItShouldBeEqualToClassNameByDefault() {
+//        val rule: Rule = RuleProxy.Companion.asRule(DummyRule())
+//        Assertions.assertThat(rule.name).isEqualTo("DummyRule")
+//    }
+//
+//    @Test
+//    fun whenRuleDescriptionIsNotSpecified_thenItShouldBeEqualToConditionNameFollowedByActionsNames() {
+//        val rule: Rule = RuleProxy.Companion.asRule(DummyRule())
+//        Assertions.assertThat(rule.description).isEqualTo("when condition then action1,action2")
+//    }
 
-    @Test
-    @Throws(Exception::class)
-    fun annotatedRulesAndNonAnnotatedRulesShouldBeUsableTogether() {
-        // Given
-        Mockito.`when`(rule1.evaluate(facts)).thenReturn(true)
-        rules.register(rule1)
-        rules.register(annotatedRule)
-
-        // When
-        rulesEngine.fire(rules, facts)
-
-        // Then
-        Mockito.verify(rule1).execute(facts)
-        Assertions.assertThat(annotatedRule.isExecuted()).isTrue
-    }
-
-    @Test
-    fun whenRuleNameIsNotSpecified_thenItShouldBeEqualToClassNameByDefault() {
-        val rule: Rule = RuleProxy.Companion.asRule(DummyRule())
-        Assertions.assertThat(rule.name).isEqualTo("DummyRule")
-    }
-
-    @Test
-    fun whenRuleDescriptionIsNotSpecified_thenItShouldBeEqualToConditionNameFollowedByActionsNames() {
-        val rule: Rule = RuleProxy.Companion.asRule(DummyRule())
-        Assertions.assertThat(rule.description).isEqualTo("when condition then action1,action2")
-    }
-
-    @Test
-    fun testCheckRules() {
-        // Given
-        Mockito.`when`(rule1.evaluate(facts)).thenReturn(true)
-        rules.register(rule1)
-        rules.register(annotatedRule)
-
-        // When
-        val result = rulesEngine.check(rules, facts)
-
-        // Then
-        Assertions.assertThat(result).hasSize(2)
-        for (r in rules) {
-            Assertions.assertThat(result[r]).isTrue
-        }
-    }
+//    @Test
+//    fun testCheckRules() {
+//        // Given
+//        Mockito.`when`(rule1.evaluate(facts)).thenReturn(true)
+//        rules.register(rule1)
+//        rules.register(annotatedRule)
+//
+//        // When
+//        val result = rulesEngine.check(rules, facts)
+//
+//        // Then
+//        Assertions.assertThat(result).hasSize(2)
+//        for (r in rules) {
+//            Assertions.assertThat(result[r]).isTrue
+//        }
+//    }
 
     @Test
     fun listenerShouldBeInvokedBeforeCheckingRules() {
@@ -268,60 +265,60 @@ class DefaultRulesEngineTest : AbstractTest() {
         rules.clear()
     }
 
-    @org.jeasy.rules.annotation.Rule(name = "myRule", description = "my rule description")
-    class AnnotatedRule {
-        private var executed = false
-        private var actionSequence: String? = ""
-        @Condition
-        fun `when`(): Boolean {
-            return true
-        }
+//    @org.jeasy.rules.annotation.Rule(name = "myRule", description = "my rule description")
+//    class AnnotatedRule {
+//        private var executed = false
+//        private var actionSequence: String? = ""
+//        @Condition
+//        fun `when`(): Boolean {
+//            return true
+//        }
+//
+//        @Action
+//        fun then0() {
+//            actionSequence += "0"
+//        }
+//
+//        @Action(order = 1)
+//        fun then1() {
+//            actionSequence += "1"
+//        }
+//
+//        @Action(order = 2)
+//        fun then2() {
+//            actionSequence += "2"
+//            executed = true
+//        }
+//
+//        @Priority
+//        fun getPriority(): Int {
+//            return 0
+//        }
+//
+//        fun isExecuted(): Boolean {
+//            return executed
+//        }
+//
+//        fun getActionSequence(): String? {
+//            return actionSequence
+//        }
+//    }
 
-        @Action
-        fun then0() {
-            actionSequence += "0"
-        }
-
-        @Action(order = 1)
-        fun then1() {
-            actionSequence += "1"
-        }
-
-        @Action(order = 2)
-        fun then2() {
-            actionSequence += "2"
-            executed = true
-        }
-
-        @Priority
-        fun getPriority(): Int {
-            return 0
-        }
-
-        fun isExecuted(): Boolean {
-            return executed
-        }
-
-        fun getActionSequence(): String? {
-            return actionSequence
-        }
-    }
-
-    @org.jeasy.rules.annotation.Rule
-    class DummyRule {
-        @Condition
-        fun condition(): Boolean {
-            return true
-        }
-
-        @Action(order = 1)
-        fun action1() {
-            // no op
-        }
-
-        @Action(order = 2)
-        fun action2() {
-            // no op
-        }
-    }
+//    @org.jeasy.rules.annotation.Rule
+//    class DummyRule {
+//        @Condition
+//        fun condition(): Boolean {
+//            return true
+//        }
+//
+//        @Action(order = 1)
+//        fun action1() {
+//            // no op
+//        }
+//
+//        @Action(order = 2)
+//        fun action2() {
+//            // no op
+//        }
+//    }
 }

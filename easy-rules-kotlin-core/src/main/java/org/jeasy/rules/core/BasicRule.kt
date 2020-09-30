@@ -77,14 +77,4 @@ open class BasicRule(
         return name
     }
 
-    override fun compareTo(rule: Rule): Int {
-        return if (priority < rule.priority) {
-            -1
-        } else if (priority > rule.priority) {
-            1
-        } else {
-            name.compareTo(rule.name)
-        }
-    }
-
 }

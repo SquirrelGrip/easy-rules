@@ -24,9 +24,8 @@
 package org.jeasy.rules.api
 
 import org.assertj.core.api.Assertions
-import org.jeasy.rules.annotation.Action
-import org.jeasy.rules.annotation.Condition
 import org.jeasy.rules.core.BasicRule
+import org.jeasy.rules.core.DummyRule
 import org.junit.Test
 import java.util.*
 
@@ -42,7 +41,7 @@ class RulesTest {
     fun rulesMustHaveUniqueName() {
         val r1: Rule = BasicRule("rule")
         val r2: Rule = BasicRule("rule")
-        val ruleSet: MutableSet<Rule?> = HashSet()
+        val ruleSet: MutableSet<Rule> = mutableSetOf()
         ruleSet.add(r1)
         ruleSet.add(r2)
         rules = Rules(ruleSet)
@@ -61,7 +60,7 @@ class RulesTest {
     fun unregisterByName() {
         val r1: Rule = BasicRule("rule1")
         val r2: Rule = BasicRule("rule2")
-        val ruleSet: MutableSet<Rule?> = HashSet()
+        val ruleSet: MutableSet<Rule> = mutableSetOf()
         ruleSet.add(r1)
         ruleSet.add(r2)
         rules = Rules(ruleSet)
@@ -72,7 +71,7 @@ class RulesTest {
     @Test
     fun unregisterByNameNonExistingRule() {
         val r1: Rule = BasicRule("rule1")
-        val ruleSet: MutableSet<Rule?> = HashSet()
+        val ruleSet: MutableSet<Rule> = mutableSetOf()
         ruleSet.add(r1)
         rules = Rules(ruleSet)
         rules.unregister("rule2")
@@ -133,15 +132,4 @@ class RulesTest {
         Assertions.assertThat(rules.size()).isEqualTo(1)
     }
 
-    @org.jeasy.rules.annotation.Rule
-    internal class DummyRule {
-        @Condition
-        fun `when`(): Boolean {
-            return true
-        }
-
-        @Action
-        fun then() {
-        }
-    }
 }

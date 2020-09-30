@@ -35,10 +35,13 @@ import org.mockito.junit.MockitoJUnitRunner
 abstract class AbstractTest {
     @Mock
     lateinit var rule1: Rule
+
     @Mock
     lateinit var rule2: Rule
+
     @Mock
     lateinit var fact1: Any
+
     @Mock
     lateinit var fact2: Any
 
@@ -54,4 +57,90 @@ abstract class AbstractTest {
         rules = Rules()
         rulesEngine = DefaultRulesEngine()
     }
+
 }
+
+class DummyRule : Rule {
+    override val name: String = "Dummy"
+    override val description: String = "Dummy Rule"
+    override val priority: Int = 3
+
+    override fun evaluate(facts: Facts): Boolean {
+        return true
+    }
+
+    override fun execute(facts: Facts) {
+        isExecuted = true
+    }
+
+    private var isExecuted = false
+
+    fun isExecuted(): Boolean {
+        return isExecuted
+    }
+
+}
+
+class WeatherRule : Rule {
+    override val name: String = "Weather Rule"
+    override val description: String = "Weather Rule"
+    override val priority: Int = 1
+
+    override fun evaluate(facts: Facts): Boolean {
+        return facts["rain"] ?: false
+    }
+
+    override fun execute(facts: Facts) {
+        println("It rains, take an umbrella!")
+        isExecuted = true
+    }
+
+    private var isExecuted = false
+
+    fun isExecuted(): Boolean {
+        return isExecuted
+    }
+}
+
+class AnotherDummyRule : Rule {
+    private var isExecuted = false
+
+    fun isExecuted(): Boolean {
+        return isExecuted
+    }
+
+    override val name: String = "Another Dummy Rule"
+    override val description: String = "Another Dummy Rule"
+    override val priority: Int = 1
+
+    override fun evaluate(facts: Facts): Boolean {
+        return true
+    }
+
+    override fun execute(facts: Facts) {
+        isExecuted = true
+    }
+}
+
+class AgeRule : Rule {
+    private var isExecuted = false
+
+    fun isExecuted(): Boolean {
+        return isExecuted
+    }
+
+    override val name: String = "Age Rule"
+    override val description: String = "Age Rule"
+    override val priority: Int = 1
+
+    override fun evaluate(facts: Facts): Boolean {
+        val age: Int = facts["age"] ?: 0
+        return age >= 18
+    }
+
+    override fun execute(facts: Facts) {
+        println("You are an adult")
+        isExecuted = true
+    }
+}
+

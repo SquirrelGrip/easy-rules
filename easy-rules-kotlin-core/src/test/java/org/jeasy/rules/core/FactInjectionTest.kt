@@ -24,11 +24,8 @@
 package org.jeasy.rules.core
 
 import org.assertj.core.api.Assertions
-import org.jeasy.rules.annotation.Action
-import org.jeasy.rules.annotation.Condition
-import org.jeasy.rules.annotation.Fact
-import org.jeasy.rules.annotation.Rule
 import org.jeasy.rules.api.Facts
+import org.jeasy.rules.api.Rule
 import org.jeasy.rules.api.Rules
 import org.jeasy.rules.api.RulesEngine
 import org.junit.Test
@@ -123,82 +120,25 @@ class FactInjectionTest {
         Assertions.assertThat(rule.isExecuted()).isFalse
     }
 
-    @Rule
-    class DummyRule {
-        lateinit var fact1: Any
-        lateinit var fact2: Any
+    class DummyRule: Rule {
+        var fact1: Any? = null
+        var fact2: Any? = null
         lateinit var facts: Facts
 
-        @Condition
-        fun `when`(
-                @Fact("fact1") fact1: Any,
-                @Fact("fact2") fact2: Any
-        ): Boolean {
-            this.fact1 = fact1
-            this.fact2 = fact2
+        override val name: String = "Fact Injection Rule"
+        override val description: String = "Fact Injection Rule"
+        override val priority: Int = 1
+
+        override fun evaluate(facts: Facts): Boolean {
+            this.fact1 = facts["fact1"]
+            this.fact2 = facts["fact2"]
             return true
         }
 
-        @Action
-        fun then(facts: Facts) {
+        override fun execute(facts: Facts) {
             this.facts = facts
         }
 
     }
 
-    @Rule
-    internal class AnotherDummyRule {
-        private var isExecuted = false
-        @Condition
-        fun `when`(): Boolean {
-            return true
-        }
-
-        @Action
-        fun then(@Fact("foo") fact: Any?) {
-            isExecuted = true
-        }
-
-        fun isExecuted(): Boolean {
-            return isExecuted
-        }
-    }
-
-    @Rule
-    internal class AgeRule {
-        private var isExecuted = false
-        @Condition
-        fun isAdult(@Fact("age") age: Int): Boolean {
-            return age >= 18
-        }
-
-        @Action
-        fun printYourAreAdult() {
-            println("You are an adult")
-            isExecuted = true
-        }
-
-        fun isExecuted(): Boolean {
-            return isExecuted
-        }
-    }
-
-    @Rule
-    internal class WeatherRule {
-        private var isExecuted = false
-        @Condition
-        fun itRains(@Fact("rain") rain: Boolean): Boolean {
-            return rain
-        }
-
-        @Action
-        fun takeAnUmbrella(facts: Facts) {
-            println("It rains, take an umbrella!")
-            isExecuted = true
-        }
-
-        fun isExecuted(): Boolean {
-            return isExecuted
-        }
-    }
 }

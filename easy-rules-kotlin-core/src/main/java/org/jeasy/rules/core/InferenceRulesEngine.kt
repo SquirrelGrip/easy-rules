@@ -50,7 +50,7 @@ class InferenceRulesEngine(
             } else {
                 LOGGER.debug("No candidate rules found for facts: {}", facts)
             }
-        } while (!selectedRules.isEmpty())
+        } while (selectedRules.isNotEmpty())
     }
 
     private fun selectCandidates(rules: Rules, facts: Facts): MutableSet<Rule> {
