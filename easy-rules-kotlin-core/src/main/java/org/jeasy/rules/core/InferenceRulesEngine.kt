@@ -39,9 +39,11 @@ import java.util.*
 class InferenceRulesEngine(
         parameters: RulesEngineParameters = RulesEngineParameters()
 ) : AbstractRulesEngine(parameters) {
-    private val delegate: DefaultRulesEngine
+
+    private val delegate: DefaultRulesEngine = DefaultRulesEngine(parameters)
+
     override fun fire(rules: Rules, facts: Facts) {
-        var selectedRules: MutableSet<Rule>
+        var selectedRules: Set<Rule>
         do {
             LOGGER.debug("Selecting candidate rules based on the following facts: {}", facts)
             selectedRules = selectCandidates(rules, facts)
@@ -53,8 +55,8 @@ class InferenceRulesEngine(
         } while (selectedRules.isNotEmpty())
     }
 
-    private fun selectCandidates(rules: Rules, facts: Facts): MutableSet<Rule> {
-        val candidates: MutableSet<Rule> = sortedSetOf()
+    private fun selectCandidates(rules: Rules, facts: Facts): Set<Rule> {
+        val candidates: MutableSet<Rule> = TreeSet()
         for (rule in rules) {
             if (rule.evaluate(facts)) {
                 candidates.add(rule)
@@ -111,10 +113,4 @@ class InferenceRulesEngine(
      *
      * @param parameters of the engine
      */
-    /**
-     * Create a new inference rules engine with default parameters.
-     */
-    init {
-        delegate = DefaultRulesEngine(parameters)
-    }
 }

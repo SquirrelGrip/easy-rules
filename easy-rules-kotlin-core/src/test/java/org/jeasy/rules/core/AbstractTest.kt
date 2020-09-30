@@ -134,7 +134,7 @@ class AgeRule : Rule {
     override val priority: Int = 1
 
     override fun evaluate(facts: Facts): Boolean {
-        val age: Int = facts["age"] ?: 0
+        val age: Int = facts.getFact("age")?.value as Int
         return age >= 18
     }
 

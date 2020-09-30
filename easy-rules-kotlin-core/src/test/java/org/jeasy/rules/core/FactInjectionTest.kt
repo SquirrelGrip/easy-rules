@@ -141,4 +141,27 @@ class FactInjectionTest {
 
     }
 
+    class AnotherDummyRule: Rule {
+        private var isExecuted = false
+
+        fun isExecuted(): Boolean {
+            return isExecuted
+        }
+
+        override val name: String = "Another Dummy Rule"
+        override val description: String = "Another Dummy Rule"
+        override val priority: Int = 2
+
+        override fun evaluate(facts: Facts): Boolean {
+            return true
+        }
+
+        override fun execute(facts: Facts) {
+            if (facts.getFact("foo") != null) {
+                isExecuted = true
+            }
+        }
+    }
+
+
 }

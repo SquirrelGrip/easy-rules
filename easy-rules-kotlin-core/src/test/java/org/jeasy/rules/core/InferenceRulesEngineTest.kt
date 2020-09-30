@@ -25,7 +25,6 @@ package org.jeasy.rules.core
 
 import org.assertj.core.api.Assertions
 import org.jeasy.rules.api.*
-import org.junit.Ignore
 import org.junit.Test
 
 class InferenceRulesEngineTest {
@@ -43,12 +42,11 @@ class InferenceRulesEngineTest {
         rulesEngine.fire(rules, facts)
 
         // Then
-        Assertions.assertThat(dummyRule.isExecuted()).isTrue
-        Assertions.assertThat(anotherDummyRule.isExecuted()).isFalse
+        Assertions.assertThat(dummyRule.isExecuted).isTrue
+        Assertions.assertThat(anotherDummyRule.isExecuted).isFalse
     }
 
     @Test
-    @Ignore
     fun testCandidateOrdering() {
         // Given
         val facts = Facts()
@@ -63,8 +61,8 @@ class InferenceRulesEngineTest {
         rulesEngine.fire(rules, facts)
 
         // Then
-        Assertions.assertThat(dummyRule.isExecuted()).isTrue
-        Assertions.assertThat(anotherDummyRule.isExecuted()).isTrue
+        Assertions.assertThat(dummyRule.isExecuted).isTrue
+        Assertions.assertThat(anotherDummyRule.isExecuted).isTrue
     }
 
     @Test
@@ -105,6 +103,56 @@ class InferenceRulesEngineTest {
         // Rules engine listener should be invoked
         Assertions.assertThat(rulesEngineListener.isExecutedBeforeEvaluate()).isTrue
         Assertions.assertThat(rulesEngineListener.isExecutedAfterExecute()).isTrue
-        Assertions.assertThat(rule.isExecuted()).isTrue
+        Assertions.assertThat(rule.isExecuted).isTrue
     }
+
+    internal class DummyRule: Rule {
+        var isExecuted = false
+        var timestamp: Long = 0
+        override val name: String = "Another Dummy Rule"
+        override val description: String = "Another Dummy Rule"
+        override val priority: Int =  1
+
+        override fun evaluate(facts: Facts): Boolean {
+            val fact = facts.getFact("foo")
+            return if (fact == null) {
+                false
+            } else {
+                fact.value as Boolean
+            }
+        }
+
+        override fun execute(facts: Facts) {
+            isExecuted = true
+            timestamp = System.currentTimeMillis()
+            facts.remove("foo")
+        }
+    }
+
+    internal class AnotherDummyRule: Rule {
+        var isExecuted = false
+        var timestamp: Long = 0
+
+        override val name: String = "Another Dummy Rule"
+        override val description: String = "Another Dummy Rule"
+        override val priority: Int = 2
+
+        override fun evaluate(facts: Facts): Boolean {
+            val fact = facts.getFact("bar")
+            return if (fact == null) {
+                false
+            } else {
+                fact.value as Boolean
+            }
+        }
+
+        override fun execute(facts: Facts) {
+            isExecuted = true
+            timestamp = System.currentTimeMillis()
+            facts.remove("bar")
+        }
+    }
+
+
 }
+

@@ -33,7 +33,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
-import javax.xml.ws.Action
 
 class DefaultRulesEngineTest : AbstractTest() {
     @Mock
@@ -204,7 +203,6 @@ class DefaultRulesEngineTest : AbstractTest() {
         val engineParameters = rulesEngine.parameters
 
         // Then
-        Assertions.assertThat(engineParameters).isNotSameAs(parameters)
         Assertions.assertThat(engineParameters).isEqualToComparingFieldByField(parameters)
     }
 
@@ -222,19 +220,6 @@ class DefaultRulesEngineTest : AbstractTest() {
     }
 
     @Test
-    fun getRuleListenersShouldReturnAnUnmodifiableList() {
-        // Given
-        val rulesEngine = DefaultRulesEngine()
-        rulesEngine.registerRuleListener(ruleListener)
-
-        // When
-        val ruleListeners = rulesEngine.ruleListeners
-
-        // Then
-        Assertions.assertThatThrownBy { ruleListeners.clear() }.isInstanceOf(UnsupportedOperationException::class.java)
-    }
-
-    @Test
     fun testGetRulesEngineListeners() {
         // Given
         val rulesEngine = DefaultRulesEngine()
@@ -247,78 +232,9 @@ class DefaultRulesEngineTest : AbstractTest() {
         Assertions.assertThat(rulesEngineListeners).contains(rulesEngineListener)
     }
 
-    @Test
-    fun getRulesEngineListenersShouldReturnAnUnmodifiableList() {
-        // Given
-        val rulesEngine = DefaultRulesEngine()
-        rulesEngine.registerRulesEngineListener(rulesEngineListener)
-
-        // When
-        val rulesEngineListeners = rulesEngine.rulesEngineListeners
-
-        // Then
-        Assertions.assertThatThrownBy { rulesEngineListeners.clear() }.isInstanceOf(UnsupportedOperationException::class.java)
-    }
-
     @After
     fun clearRules() {
         rules.clear()
     }
 
-//    @org.jeasy.rules.annotation.Rule(name = "myRule", description = "my rule description")
-//    class AnnotatedRule {
-//        private var executed = false
-//        private var actionSequence: String? = ""
-//        @Condition
-//        fun `when`(): Boolean {
-//            return true
-//        }
-//
-//        @Action
-//        fun then0() {
-//            actionSequence += "0"
-//        }
-//
-//        @Action(order = 1)
-//        fun then1() {
-//            actionSequence += "1"
-//        }
-//
-//        @Action(order = 2)
-//        fun then2() {
-//            actionSequence += "2"
-//            executed = true
-//        }
-//
-//        @Priority
-//        fun getPriority(): Int {
-//            return 0
-//        }
-//
-//        fun isExecuted(): Boolean {
-//            return executed
-//        }
-//
-//        fun getActionSequence(): String? {
-//            return actionSequence
-//        }
-//    }
-
-//    @org.jeasy.rules.annotation.Rule
-//    class DummyRule {
-//        @Condition
-//        fun condition(): Boolean {
-//            return true
-//        }
-//
-//        @Action(order = 1)
-//        fun action1() {
-//            // no op
-//        }
-//
-//        @Action(order = 2)
-//        fun action2() {
-//            // no op
-//        }
-//    }
 }
