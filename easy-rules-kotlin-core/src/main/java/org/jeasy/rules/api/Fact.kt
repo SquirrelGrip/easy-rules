@@ -23,8 +23,6 @@
  */
 package org.jeasy.rules.api
 
-import java.util.*
-
 /**
  * A class representing a named fact. Facts have unique names within a [Facts]
  * instance.
@@ -35,4 +33,6 @@ import java.util.*
 data class Fact<T>(
         val name: String,
         val value: T
-)
+): Comparable<Fact<*>> {
+    override fun compareTo(other: Fact<*>) = name.compareTo(other.name)
+}

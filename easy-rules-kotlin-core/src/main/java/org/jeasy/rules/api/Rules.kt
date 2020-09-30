@@ -37,6 +37,11 @@ class Rules : Iterable<Rule> {
 
     /**
      * Create a new [Rules] object.
+     */
+    constructor()
+
+    /**
+     * Create a new [Rules] object.
      *
      * @param rules to register
      */
@@ -49,7 +54,8 @@ class Rules : Iterable<Rule> {
      *
      * @param rules to register
      */
-    constructor(vararg rules: Rule) {
+    constructor(firstRule: Rule, vararg rules: Rule) {
+        this.rules.add(firstRule)
         Collections.addAll(this.rules, *rules)
     }
 

@@ -34,53 +34,24 @@ import org.jeasy.rules.api.RulesEngineParameters
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
 abstract class AbstractRulesEngine(
-        var parameters: RulesEngineParameters = RulesEngineParameters()
+        override val parameters: RulesEngineParameters = RulesEngineParameters(),
+        override val ruleListeners: MutableList<RuleListener> = mutableListOf(),
+        override val rulesEngineListeners: MutableList<RulesEngineListener> = mutableListOf()
 ) : RulesEngine {
-    var ruleListeners: MutableList<RuleListener> = mutableListOf()
-    var rulesEngineListeners: MutableList<RulesEngineListener> = mutableListOf()
 
-    /**
-     * Return a copy of the rules engine parameters.
-     * @return copy of the rules engine parameters
-     */
-    override fun getParameters(): RulesEngineParameters {
-        return RulesEngineParameters(
-                parameters.isSkipOnFirstAppliedRule(),
-                parameters.isSkipOnFirstFailedRule(),
-                parameters.isSkipOnFirstNonTriggeredRule(),
-                parameters.getPriorityThreshold()
-        )
-    }
-
-    /**
-     * Return an unmodifiable list of the registered rule listeners.
-     * @return an unmodifiable list of the registered rule listeners
-     */
-    override fun getRuleListeners(): List<RuleListener> {
-        return ruleListeners.toList()
-    }
-
-    /**
-     * Return an unmodifiable list of the registered rules engine listeners
-     * @return an unmodifiable list of the registered rules engine listeners
-     */
-    override fun getRulesEngineListeners(): List<RulesEngineListener?>? {
-        return Collections.unmodifiableList(rulesEngineListeners)
-    }
-
-    open fun registerRuleListener(ruleListener: RuleListener?) {
+    open fun registerRuleListener(ruleListener: RuleListener) {
         ruleListeners.add(ruleListener)
     }
 
-    open fun registerRuleListeners(ruleListeners: MutableList<RuleListener?>?) {
+    open fun registerRuleListeners(ruleListeners: List<RuleListener>) {
         this.ruleListeners.addAll(ruleListeners)
     }
 
-    open fun registerRulesEngineListener(rulesEngineListener: RulesEngineListener?) {
+    open fun registerRulesEngineListener(rulesEngineListener: RulesEngineListener) {
         rulesEngineListeners.add(rulesEngineListener)
     }
 
-    open fun registerRulesEngineListeners(rulesEngineListeners: MutableList<RulesEngineListener?>?) {
+    open fun registerRulesEngineListeners(rulesEngineListeners: List<RulesEngineListener>) {
         this.rulesEngineListeners.addAll(rulesEngineListeners)
     }
 

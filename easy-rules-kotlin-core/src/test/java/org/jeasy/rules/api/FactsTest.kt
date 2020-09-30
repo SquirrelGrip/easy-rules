@@ -27,14 +27,14 @@ import org.assertj.core.api.Assertions
 import org.junit.Test
 
 class FactsTest {
-    private val facts: Facts? = Facts()
+    private val facts: Facts = Facts()
     @Test
     fun factsMustHaveUniqueName() {
         facts.add(Fact("foo", 1))
         facts.add(Fact("foo", 2))
         Assertions.assertThat(facts).hasSize(1)
         val fact = facts.getFact("foo")
-        Assertions.assertThat(fact.value).isEqualTo(2)
+        Assertions.assertThat(fact?.value).isEqualTo(2)
     }
 
     @Test

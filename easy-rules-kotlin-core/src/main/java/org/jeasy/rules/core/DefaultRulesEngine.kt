@@ -37,18 +37,9 @@ import java.util.function.Consumer
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-class DefaultRulesEngine : AbstractRulesEngine {
-    /**
-     * Create a new [DefaultRulesEngine] with default parameters.
-     */
-    constructor() : super() {}
-
-    /**
-     * Create a new [DefaultRulesEngine].
-     *
-     * @param parameters of the engine
-     */
-    constructor(parameters: RulesEngineParameters) : super(parameters) {}
+class DefaultRulesEngine(
+        parameters: RulesEngineParameters = RulesEngineParameters()
+) : AbstractRulesEngine(parameters) {
 
     override fun fire(rules: Rules, facts: Facts) {
         triggerListenersBeforeRules(rules, facts)
@@ -56,7 +47,7 @@ class DefaultRulesEngine : AbstractRulesEngine {
         triggerListenersAfterRules(rules, facts)
     }
 
-    fun doFire(rules: Rules, facts: Facts) {
+    private fun doFire(rules: Rules, facts: Facts) {
         if (rules.isEmpty()) {
             LOGGER.warn("No rules registered! Nothing to apply")
             return
@@ -66,8 +57,8 @@ class DefaultRulesEngine : AbstractRulesEngine {
         log(facts)
         LOGGER.debug("Rules evaluation started")
         for (rule in rules) {
-            val name = rule.getName()
-            val priority = rule.getPriority()
+            val name = rule.name
+            val priority = rule.priority
             if (priority > parameters.priorityThreshold) {
                 LOGGER.debug("Rule priority threshold ({}) exceeded at rule '{}' with priority={}, next rules will be skipped",
                         parameters.priorityThreshold, name, priority)
@@ -84,7 +75,7 @@ class DefaultRulesEngine : AbstractRulesEngine {
                 LOGGER.error("Rule '$name' evaluated with error", exception)
                 triggerListenersOnEvaluationError(rule, facts, exception)
                 // give the option to either skip next rules on evaluation error or continue by considering the evaluation error as false
-                if (parameters.isSkipOnFirstNonTriggeredRule) {
+                if (parameters.skipOnFirstNonTriggeredRule) {
                     LOGGER.debug("Next rules will be skipped since parameter skipOnFirstNonTriggeredRule is set")
                     break
                 }
@@ -97,14 +88,14 @@ class DefaultRulesEngine : AbstractRulesEngine {
                     rule.execute(facts)
                     LOGGER.debug("Rule '{}' performed successfully", name)
                     triggerListenersOnSuccess(rule, facts)
-                    if (parameters.isSkipOnFirstAppliedRule) {
+                    if (parameters.skipOnFirstAppliedRule) {
                         LOGGER.debug("Next rules will be skipped since parameter skipOnFirstAppliedRule is set")
                         break
                     }
                 } catch (exception: Exception) {
                     LOGGER.error("Rule '$name' performed with error", exception)
                     triggerListenersOnFailure(rule, exception, facts)
-                    if (parameters.isSkipOnFirstFailedRule) {
+                    if (parameters.skipOnFirstFailedRule) {
                         LOGGER.debug("Next rules will be skipped since parameter skipOnFirstFailedRule is set")
                         break
                     }
@@ -112,7 +103,7 @@ class DefaultRulesEngine : AbstractRulesEngine {
             } else {
                 LOGGER.debug("Rule '{}' has been evaluated to false, it has not been executed", name)
                 triggerListenersAfterEvaluate(rule, facts, false)
-                if (parameters.isSkipOnFirstNonTriggeredRule) {
+                if (parameters.skipOnFirstNonTriggeredRule) {
                     LOGGER.debug("Next rules will be skipped since parameter skipOnFirstNonTriggeredRule is set")
                     break
                 }
@@ -124,72 +115,72 @@ class DefaultRulesEngine : AbstractRulesEngine {
         LOGGER.debug("{}", parameters)
     }
 
-    private fun log(rules: Rules?) {
+    private fun log(rules: Rules) {
         LOGGER.debug("Registered rules:")
         for (rule in rules) {
             LOGGER.debug("Rule { name = '{}', description = '{}', priority = '{}'}",
-                    rule.getName(), rule.getDescription(), rule.getPriority())
+                    rule.name, rule.description, rule.priority)
         }
     }
 
-    private fun log(facts: Facts?) {
+    private fun log(facts: Facts) {
         LOGGER.debug("Known facts:")
         for (fact in facts) {
             LOGGER.debug("{}", fact)
         }
     }
 
-    override fun check(rules: Rules?, facts: Facts?): MutableMap<Rule?, Boolean?>? {
+    override fun check(rules: Rules, facts: Facts): Map<Rule, Boolean> {
         triggerListenersBeforeRules(rules, facts)
         val result = doCheck(rules, facts)
         triggerListenersAfterRules(rules, facts)
         return result
     }
 
-    private fun doCheck(rules: Rules?, facts: Facts?): MutableMap<Rule?, Boolean?>? {
+    private fun doCheck(rules: Rules, facts: Facts): Map<Rule, Boolean> {
         LOGGER.debug("Checking rules")
-        val result: MutableMap<Rule?, Boolean?> = HashMap()
+        val result: MutableMap<Rule, Boolean> = mutableMapOf()
         for (rule in rules) {
             if (shouldBeEvaluated(rule, facts)) {
                 result[rule] = rule.evaluate(facts)
             }
         }
-        return result
+        return result.toMap()
     }
 
-    private fun triggerListenersOnFailure(rule: Rule?, exception: Exception?, facts: Facts?) {
-        ruleListeners.forEach(Consumer { ruleListener: RuleListener? -> ruleListener.onFailure(rule, facts, exception) })
+    private fun triggerListenersOnFailure(rule: Rule, exception: Exception, facts: Facts) {
+        ruleListeners.forEach(Consumer { ruleListener: RuleListener -> ruleListener.onFailure(rule, facts, exception) })
     }
 
-    private fun triggerListenersOnSuccess(rule: Rule?, facts: Facts?) {
-        ruleListeners.forEach(Consumer { ruleListener: RuleListener? -> ruleListener.onSuccess(rule, facts) })
+    private fun triggerListenersOnSuccess(rule: Rule, facts: Facts) {
+        ruleListeners.forEach(Consumer { ruleListener: RuleListener -> ruleListener.onSuccess(rule, facts) })
     }
 
-    private fun triggerListenersBeforeExecute(rule: Rule?, facts: Facts?) {
-        ruleListeners.forEach(Consumer { ruleListener: RuleListener? -> ruleListener.beforeExecute(rule, facts) })
+    private fun triggerListenersBeforeExecute(rule: Rule, facts: Facts) {
+        ruleListeners.forEach(Consumer { ruleListener: RuleListener -> ruleListener.beforeExecute(rule, facts) })
     }
 
-    private fun triggerListenersBeforeEvaluate(rule: Rule?, facts: Facts?): Boolean {
-        return ruleListeners.stream().allMatch { ruleListener: RuleListener? -> ruleListener.beforeEvaluate(rule, facts) }
+    private fun triggerListenersBeforeEvaluate(rule: Rule, facts: Facts): Boolean {
+        return ruleListeners.stream().allMatch { ruleListener: RuleListener -> ruleListener.beforeEvaluate(rule, facts) }
     }
 
-    private fun triggerListenersAfterEvaluate(rule: Rule?, facts: Facts?, evaluationResult: Boolean) {
-        ruleListeners.forEach(Consumer { ruleListener: RuleListener? -> ruleListener.afterEvaluate(rule, facts, evaluationResult) })
+    private fun triggerListenersAfterEvaluate(rule: Rule, facts: Facts, evaluationResult: Boolean) {
+        ruleListeners.forEach(Consumer { ruleListener: RuleListener -> ruleListener.afterEvaluate(rule, facts, evaluationResult) })
     }
 
-    private fun triggerListenersOnEvaluationError(rule: Rule?, facts: Facts?, exception: Exception?) {
-        ruleListeners.forEach(Consumer { ruleListener: RuleListener? -> ruleListener.onEvaluationError(rule, facts, exception) })
+    private fun triggerListenersOnEvaluationError(rule: Rule, facts: Facts, exception: Exception) {
+        ruleListeners.forEach(Consumer { ruleListener: RuleListener -> ruleListener.onEvaluationError(rule, facts, exception) })
     }
 
-    private fun triggerListenersBeforeRules(rule: Rules?, facts: Facts?) {
-        rulesEngineListeners.forEach(Consumer { rulesEngineListener: RulesEngineListener? -> rulesEngineListener.beforeEvaluate(rule, facts) })
+    private fun triggerListenersBeforeRules(rule: Rules, facts: Facts) {
+        rulesEngineListeners.forEach(Consumer { rulesEngineListener: RulesEngineListener -> rulesEngineListener.beforeEvaluate(rule, facts) })
     }
 
-    private fun triggerListenersAfterRules(rule: Rules?, facts: Facts?) {
-        rulesEngineListeners.forEach(Consumer { rulesEngineListener: RulesEngineListener? -> rulesEngineListener.afterExecute(rule, facts) })
+    private fun triggerListenersAfterRules(rule: Rules, facts: Facts) {
+        rulesEngineListeners.forEach(Consumer { rulesEngineListener: RulesEngineListener -> rulesEngineListener.afterExecute(rule, facts) })
     }
 
-    private fun shouldBeEvaluated(rule: Rule?, facts: Facts?): Boolean {
+    private fun shouldBeEvaluated(rule: Rule, facts: Facts): Boolean {
         return triggerListenersBeforeEvaluate(rule, facts)
     }
 

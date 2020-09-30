@@ -32,14 +32,15 @@ import org.jeasy.rules.api.RulesEngineParameters;
 public class FizzBuzzWithEasyRules {
     public static void main(String[] args) {
         // create rules engine
-        RulesEngineParameters parameters = new RulesEngineParameters().skipOnFirstAppliedRule(true);
+        RulesEngineParameters parameters = new RulesEngineParameters().skipOnFirstAppliedRule(false);
         RulesEngine fizzBuzzEngine = new DefaultRulesEngine(parameters);
 
         // create rules
         Rules rules = new Rules();
         rules.register(new FizzRule());
         rules.register(new BuzzRule());
-        rules.register(new FizzBuzzRule(new FizzRule(), new BuzzRule()));
+        rules.register(new FooRule());
+        rules.register(new BarRule());
         rules.register(new NonFizzBuzzRule());
 
         // fire rules

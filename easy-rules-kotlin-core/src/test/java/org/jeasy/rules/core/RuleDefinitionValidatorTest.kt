@@ -29,7 +29,8 @@ import org.junit.Before
 import org.junit.Test
 
 class RuleDefinitionValidatorTest {
-    private var ruleDefinitionValidator: RuleDefinitionValidator? = null
+    private lateinit var ruleDefinitionValidator: RuleDefinitionValidator
+
     @Before
     fun setup() {
         ruleDefinitionValidator = RuleDefinitionValidator()

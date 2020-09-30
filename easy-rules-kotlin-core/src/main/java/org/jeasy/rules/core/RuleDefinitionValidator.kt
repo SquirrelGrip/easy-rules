@@ -44,7 +44,7 @@ internal class RuleDefinitionValidator {
     }
 
     private fun checkRuleClass(rule: Any) {
-        require(isRuleClassWellDefined(rule)) { String.format("Rule '${rule.javaClass.name}' is not annotated with '${Rule::class.java.name}'") }
+        require(isRuleClassWellDefined(rule)) { "Rule '${rule.javaClass.name}' is not annotated with '${Rule::class.java.name}'" }
     }
 
     private fun checkConditionMethod(rule: Any) {
@@ -112,7 +112,7 @@ internal class RuleDefinitionValidator {
     private fun getNotAnnotatedParameter(method: Method): Parameter? {
         val parameters = method.getParameters()
         for (parameter in parameters) {
-            if (parameter.annotations.size == 0) {
+            if (parameter.annotations.isEmpty()) {
                 return parameter
             }
         }

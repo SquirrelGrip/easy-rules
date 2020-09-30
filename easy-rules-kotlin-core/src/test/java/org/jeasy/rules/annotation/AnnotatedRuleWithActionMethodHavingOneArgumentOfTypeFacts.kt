@@ -33,6 +33,6 @@ class AnnotatedRuleWithActionMethodHavingOneArgumentOfTypeFacts {
     }
 
     @Action
-    fun then(facts: Facts?) {
+    fun then(facts: Facts) {
     }
 }

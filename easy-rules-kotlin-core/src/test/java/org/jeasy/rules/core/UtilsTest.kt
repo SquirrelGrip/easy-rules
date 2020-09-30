@@ -31,19 +31,19 @@ import java.lang.annotation.RetentionPolicy
 class UtilsTest {
     @Test
     fun findAnnotationWithClassWhereAnnotationIsPresent() {
-        val foo: Annotation? = Utils.findAnnotation(Foo::class.java, AnnotationIsPresent::class.java)
+        val foo: Annotation = Utils.findAnnotation(Foo::class.java, AnnotationIsPresent::class.java)
         assertCorrectAnnotationIsFound(Foo::class.java, foo)
     }
 
     @Test
     fun findAnnotationWithClassWhereAnnotationIsPresentViaMetaAnnotation() {
-        val foo: Annotation? = Utils.findAnnotation(Foo::class.java, AnnotationIsPresentViaMetaAnnotation::class.java)
+        val foo: Annotation = Utils.findAnnotation(Foo::class.java, AnnotationIsPresentViaMetaAnnotation::class.java)
         assertCorrectAnnotationIsFound(Foo::class.java, foo)
     }
 
     @Test
     fun findAnnotationWithClassWhereAnnotationIsNotPresent() {
-        val foo: Annotation? = Utils.findAnnotation(Foo::class.java, Any::class.java)
+        val foo: Annotation = Utils.findAnnotation(Foo::class.java, Any::class.java)
         Assert.assertNull(foo)
     }
 
@@ -64,12 +64,12 @@ class UtilsTest {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
-    private inner annotation class Foo
+    private annotation class Foo
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
     @Foo
-    private inner annotation class MetaFoo
+    private annotation class MetaFoo
 
     @Foo
     private class AnnotationIsPresent
@@ -78,9 +78,9 @@ class UtilsTest {
     private class AnnotationIsPresentViaMetaAnnotation
     companion object {
         private fun assertCorrectAnnotationIsFound(
-                expectedAnnotationType: Class<*>?, actualAnnotation: Annotation?) {
+                expectedAnnotationType: Class<*>, actualAnnotation: Annotation) {
             Assert.assertNotNull(actualAnnotation)
-            Assert.assertEquals(expectedAnnotationType, actualAnnotation.annotationType())
+            Assert.assertEquals(expectedAnnotationType, actualAnnotation.javaClass)
         }
     }
 }

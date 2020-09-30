@@ -32,15 +32,16 @@ import java.util.*
 
 class RulesEngineListenerTest : AbstractTest() {
     @Mock
-    private val rulesEngineListener1: RulesEngineListener? = null
+    lateinit var rulesEngineListener1: RulesEngineListener
 
     @Mock
-    private val rulesEngineListener2: RulesEngineListener? = null
+    lateinit var rulesEngineListener2: RulesEngineListener
+
     @Before
     @Throws(Exception::class)
     override fun setup() {
         super.setup()
-        rulesEngine.registerRulesEngineListeners(Arrays.asList(rulesEngineListener1, rulesEngineListener2))
+        rulesEngine.registerRulesEngineListeners(listOf(rulesEngineListener1, rulesEngineListener2))
     }
 
     @Test

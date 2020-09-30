@@ -33,114 +33,33 @@ package org.jeasy.rules.api
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-class RulesEngineParameters {
-    /**
-     * Parameter to skip next applicable rules when a rule is applied.
-     */
-    private var skipOnFirstAppliedRule = false
-
-    /**
-     * Parameter to skip next applicable rules when a rule is non triggered
-     */
-    private var skipOnFirstNonTriggeredRule = false
-
-    /**
-     * Parameter to skip next applicable rules when a rule has failed.
-     */
-    private var skipOnFirstFailedRule = false
-
-    /**
-     * Parameter to skip next rules if priority exceeds a user defined threshold.
-     */
-    private var priorityThreshold: Int
-
-    /**
-     * Create a new [RulesEngineParameters] with default values.
-     */
-    constructor() {
-        priorityThreshold = DEFAULT_RULE_PRIORITY_THRESHOLD
-    }
-
-    /**
-     * Create a new [RulesEngineParameters].
-     *
-     * @param skipOnFirstAppliedRule parameter to skip next applicable rules on first applied rule.
-     * @param skipOnFirstFailedRule parameter to skip next applicable rules on first failed rule.
-     * @param skipOnFirstNonTriggeredRule parameter to skip next applicable rules on first non triggered rule.
-     * @param priorityThreshold threshold after which rules should be skipped.
-     */
-    constructor(skipOnFirstAppliedRule: Boolean, skipOnFirstFailedRule: Boolean, skipOnFirstNonTriggeredRule: Boolean, priorityThreshold: Int) {
+data class RulesEngineParameters(
+        var skipOnFirstAppliedRule: Boolean = false,
+        var skipOnFirstNonTriggeredRule: Boolean = false,
+        var skipOnFirstFailedRule: Boolean = false,
+        var priorityThreshold: Int = DEFAULT_RULE_PRIORITY_THRESHOLD
+) {
+    fun skipOnFirstAppliedRule(skipOnFirstAppliedRule: Boolean): RulesEngineParameters {
         this.skipOnFirstAppliedRule = skipOnFirstAppliedRule
+        return this
+    }
+
+    fun skipOnFirstFailedRule(skipOnFirstFailedRule: Boolean): RulesEngineParameters {
         this.skipOnFirstFailedRule = skipOnFirstFailedRule
+        return this
+    }
+
+    fun skipOnFirstNonTriggeredRule(skipOnFirstNonTriggeredRule: Boolean): RulesEngineParameters {
         this.skipOnFirstNonTriggeredRule = skipOnFirstNonTriggeredRule
+        return this
+    }
+
+    fun priorityThreshold(priorityThreshold: Int): RulesEngineParameters {
         this.priorityThreshold = priorityThreshold
-    }
-
-    fun getPriorityThreshold(): Int {
-        return priorityThreshold
-    }
-
-    fun setPriorityThreshold(priorityThreshold: Int) {
-        this.priorityThreshold = priorityThreshold
-    }
-
-    fun priorityThreshold(priorityThreshold: Int): RulesEngineParameters? {
-        setPriorityThreshold(priorityThreshold)
         return this
-    }
-
-    fun isSkipOnFirstAppliedRule(): Boolean {
-        return skipOnFirstAppliedRule
-    }
-
-    fun setSkipOnFirstAppliedRule(skipOnFirstAppliedRule: Boolean) {
-        this.skipOnFirstAppliedRule = skipOnFirstAppliedRule
-    }
-
-    fun skipOnFirstAppliedRule(skipOnFirstAppliedRule: Boolean): RulesEngineParameters? {
-        setSkipOnFirstAppliedRule(skipOnFirstAppliedRule)
-        return this
-    }
-
-    fun isSkipOnFirstNonTriggeredRule(): Boolean {
-        return skipOnFirstNonTriggeredRule
-    }
-
-    fun setSkipOnFirstNonTriggeredRule(skipOnFirstNonTriggeredRule: Boolean) {
-        this.skipOnFirstNonTriggeredRule = skipOnFirstNonTriggeredRule
-    }
-
-    fun skipOnFirstNonTriggeredRule(skipOnFirstNonTriggeredRule: Boolean): RulesEngineParameters? {
-        setSkipOnFirstNonTriggeredRule(skipOnFirstNonTriggeredRule)
-        return this
-    }
-
-    fun isSkipOnFirstFailedRule(): Boolean {
-        return skipOnFirstFailedRule
-    }
-
-    fun setSkipOnFirstFailedRule(skipOnFirstFailedRule: Boolean) {
-        this.skipOnFirstFailedRule = skipOnFirstFailedRule
-    }
-
-    fun skipOnFirstFailedRule(skipOnFirstFailedRule: Boolean): RulesEngineParameters? {
-        setSkipOnFirstFailedRule(skipOnFirstFailedRule)
-        return this
-    }
-
-    override fun toString(): String {
-        return "Engine parameters { " +
-                "skipOnFirstAppliedRule = " + skipOnFirstAppliedRule +
-                ", skipOnFirstNonTriggeredRule = " + skipOnFirstNonTriggeredRule +
-                ", skipOnFirstFailedRule = " + skipOnFirstFailedRule +
-                ", priorityThreshold = " + priorityThreshold +
-                " }"
     }
 
     companion object {
-        /**
-         * Default rule priority threshold.
-         */
         const val DEFAULT_RULE_PRIORITY_THRESHOLD = Int.MAX_VALUE
     }
 }

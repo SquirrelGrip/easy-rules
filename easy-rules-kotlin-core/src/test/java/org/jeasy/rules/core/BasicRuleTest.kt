@@ -53,45 +53,31 @@ class BasicRuleTest : AbstractTest() {
         Assertions.assertThat(rules).containsSequence(rule1, rule3, rule2)
     }
 
-    internal class FirstRule : BasicRule() {
-        override fun getPriority(): Int {
-            return 1
-        }
-
-        override fun evaluate(facts: Facts?): Boolean {
+    internal class FirstRule : BasicRule(
+            name = "rule1",
+            priority = 1
+    ) {
+        override fun evaluate(facts: Facts): Boolean {
             return true
         }
 
-        override fun getName(): String? {
-            return "rule1"
+    }
+
+    internal class SecondRule : BasicRule(
+            name = "rule2",
+            priority = 3
+    ) {
+        override fun evaluate(facts: Facts): Boolean {
+            return true
         }
     }
 
-    internal class SecondRule : BasicRule() {
-        override fun getPriority(): Int {
-            return 3
-        }
-
-        override fun evaluate(facts: Facts?): Boolean {
+    internal class ThirdRule : BasicRule(
+            name = "rule3",
+            priority = 2
+    ) {
+        override fun evaluate(facts: Facts): Boolean {
             return true
-        }
-
-        override fun getName(): String? {
-            return "rule2"
-        }
-    }
-
-    internal class ThirdRule : BasicRule() {
-        override fun getPriority(): Int {
-            return 2
-        }
-
-        override fun evaluate(facts: Facts?): Boolean {
-            return true
-        }
-
-        override fun getName(): String? {
-            return "rule3"
         }
     }
 }

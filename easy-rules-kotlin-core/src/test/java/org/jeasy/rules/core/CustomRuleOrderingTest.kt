@@ -33,23 +33,24 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class CustomRuleOrderingTest : AbstractTest() {
     @Mock
-    private val rule1: MyRule? = null
+    private lateinit var myRule1: MyRule
 
     @Mock
-    private val rule2: MyRule? = null
+    private lateinit var myRule2: MyRule
+
     @Test
     @Throws(Exception::class)
     fun whenCompareToIsOverridden_thenShouldExecuteRulesInTheCustomOrder() {
         // Given
-        Mockito.`when`(rule1.name).thenReturn("a")
-        Mockito.`when`(rule1.priority).thenReturn(1)
-        Mockito.`when`(rule1.evaluate(facts)).thenReturn(true)
-        Mockito.`when`(rule2.name).thenReturn("b")
-        Mockito.`when`(rule2.priority).thenReturn(0)
-        Mockito.`when`(rule2.evaluate(facts)).thenReturn(true)
-        Mockito.`when`(rule2.compareTo(rule1)).thenCallRealMethod()
-        rules.register(rule1)
-        rules.register(rule2)
+        Mockito.`when`(myRule1.name).thenReturn("a")
+        Mockito.`when`(myRule1.priority).thenReturn(1)
+        Mockito.`when`(myRule1.evaluate(facts)).thenReturn(true)
+        Mockito.`when`(myRule2.name).thenReturn("b")
+        Mockito.`when`(myRule2.priority).thenReturn(0)
+        Mockito.`when`(myRule2.evaluate(facts)).thenReturn(true)
+        Mockito.`when`(myRule2.compareTo(myRule1)).thenCallRealMethod()
+        rules.register(myRule1)
+        rules.register(myRule2)
 
         // When
         rulesEngine.fire(rules, facts)
@@ -59,14 +60,14 @@ class CustomRuleOrderingTest : AbstractTest() {
          * By default, if compareTo is not overridden, then rule2 should be executed first (priority 0 < 1).
          * But in this case, the compareTo method order rules by their name, so rule1 should be executed first ("a" < "b")
          */
-        val inOrder = Mockito.inOrder(rule1, rule2)
-        inOrder.verify<MyRule?>(rule1).execute(facts)
-        inOrder.verify<MyRule?>(rule2).execute(facts)
+        val inOrder = Mockito.inOrder(myRule1, myRule2)
+        inOrder.verify(myRule1).execute(facts)
+        inOrder.verify(myRule2).execute(facts)
     }
 
     internal class MyRule : BasicRule() {
-        override fun compareTo(rule: Rule?): Int {
-            return getName().compareTo(rule.getName())
+        override fun compareTo(rule: Rule): Int {
+            return name.compareTo(rule.name)
         }
     }
 }

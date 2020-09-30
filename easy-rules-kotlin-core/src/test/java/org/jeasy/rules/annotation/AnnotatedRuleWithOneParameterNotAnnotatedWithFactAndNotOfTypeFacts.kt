@@ -26,11 +26,17 @@ package org.jeasy.rules.annotation
 @Rule
 class AnnotatedRuleWithOneParameterNotAnnotatedWithFactAndNotOfTypeFacts {
     @Condition
-    fun `when`(@Fact("fact1") fact1: Any?, fact2: Any?): Boolean {
+    fun `when`(
+            @Fact("fact1") fact1: Any,
+            fact2: Any
+    ): Boolean {
         return true
     }
 
     @Action
-    fun then(@Fact("fact1") fact1: Any?, fact2: Any?) {
+    fun then(
+            @Fact("fact1") fact1: Any,
+            fact2: Any
+    ) {
     }
 }

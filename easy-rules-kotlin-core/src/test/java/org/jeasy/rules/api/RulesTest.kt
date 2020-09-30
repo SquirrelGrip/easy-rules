@@ -31,7 +31,7 @@ import org.junit.Test
 import java.util.*
 
 class RulesTest {
-    private var rules: Rules? = Rules()
+    private var rules: Rules = Rules()
     @Test
     fun register() {
         rules.register(DummyRule())
@@ -131,11 +131,6 @@ class RulesTest {
         Assertions.assertThat(rules.size()).isEqualTo(2)
         rules.unregister(BasicRule("ruleA"))
         Assertions.assertThat(rules.size()).isEqualTo(1)
-    }
-
-    @Test(expected = NullPointerException::class)
-    fun whenRegisterNullRule_thenShouldThrowNullPointerException() {
-        rules.register(null)
     }
 
     @org.jeasy.rules.annotation.Rule

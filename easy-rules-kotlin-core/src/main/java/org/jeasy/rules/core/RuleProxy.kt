@@ -25,33 +25,26 @@ package org.jeasy.rules.core
 
 import org.jeasy.rules.annotation.*
 import org.jeasy.rules.api.Facts
+import org.jeasy.rules.api.Rule.Companion.DEFAULT_NAME
 import org.slf4j.LoggerFactory
+import java.io.InvalidClassException
 import java.lang.reflect.InvocationHandler
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
-import java.util.*
 
 /**
  * Main class to create rule proxies from annotated objects.
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-class RuleProxy private constructor(private val target: Any) : InvocationHandler {
-    private lateinit var name: String
-    private lateinit var description: String
-    private var priority: Int
-    private var methods: Array<Method>
-    private var conditionMethod: Method? = null
-    private var actionMethods: MutableSet<ActionMethodOrderBean?>? = null
-    private var compareToMethod: Method? = null
-    private var toStringMethod: Method? = null
-    private lateinit var annotation: Rule
+class RuleProxy private constructor(
+        val target: Any
+) : InvocationHandler {
 
     @Throws(Throwable::class)
-    override fun invoke(proxy: Any, method: Method, args: Array<Any>): Any? {
-        val methodName = method.getName()
-        return when (methodName) {
+    override fun invoke(proxy: Any, method: Method, args: Array<Any?>): Any? {
+        return when (method.name) {
             "getName" -> getRuleName()
             "getDescription" -> getRuleDescription()
             "getPriority" -> getRulePriority()
@@ -66,7 +59,7 @@ class RuleProxy private constructor(private val target: Any) : InvocationHandler
     }
 
     @Throws(IllegalAccessException::class, InvocationTargetException::class)
-    private fun evaluateMethod(args: Array<Any>): Any {
+    private fun evaluateMethod(args: Array<Any?>): Any? {
         val facts = args[0] as Facts
         val conditionMethod = getConditionMethod()
         return try {
@@ -74,20 +67,20 @@ class RuleProxy private constructor(private val target: Any) : InvocationHandler
             conditionMethod.invoke(target, *actualParameters.toTypedArray()) // validated upfront
         } catch (e: NoSuchFactException) {
             LOGGER.warn("Rule '{}' has been evaluated to false due to a declared but missing fact '{}' in {}",
-                    getTargetClass().getName(), e.missingFact, facts)
+                    getTargetClass().name, e.missingFact, facts)
             false
         } catch (e: IllegalArgumentException) {
             LOGGER.warn("Types of injected facts in method '{}' in rule '{}' do not match parameters types",
-                    conditionMethod.getName(), getTargetClass().getName(), e)
+                    conditionMethod.getName(), getTargetClass().name, e)
             false
         }
     }
 
     @Throws(IllegalAccessException::class, InvocationTargetException::class)
-    private fun executeMethod(args: Array<Any>): Any? {
-        val facts = args.get(0) as Facts?
+    private fun executeMethod(args: Array<Any?>): Any? {
+        val facts = args[0] as Facts
         for (actionMethodBean in getActionMethodBeans()) {
-            val actionMethod = actionMethodBean.getMethod()
+            val actionMethod = actionMethodBean.method
             val actualParameters = getActualParameters(actionMethod, facts)
             actionMethod.invoke(target, *actualParameters.toTypedArray())
         }
@@ -95,53 +88,47 @@ class RuleProxy private constructor(private val target: Any) : InvocationHandler
     }
 
     @Throws(Exception::class)
-    private fun compareToMethod(args: Array<Any>): Any? {
+    private fun compareToMethod(args: Array<Any?>): Any? {
         val compareToMethod = getCompareToMethod()
-        val otherRule = args.get(0) // validated upfront
-        return if (compareToMethod != null && Proxy.isProxyClass(otherRule.javaClass)) {
+        val otherRule = args[0] // validated upfront
+        return if (compareToMethod != null && otherRule != null && Proxy.isProxyClass(otherRule.javaClass)) {
             require(compareToMethod.parameters.size == 1) { "compareTo method must have a single argument" }
             val ruleProxy = Proxy.getInvocationHandler(otherRule) as RuleProxy
-            compareToMethod.invoke(target, ruleProxy.getTarget())
+            compareToMethod.invoke(target, ruleProxy.target)
         } else {
-            compareTo(otherRule as org.jeasy.rules.api.Rule?)
+            compareTo(otherRule as org.jeasy.rules.api.Rule)
         }
     }
 
-    private fun getActualParameters(method: Method, facts: Facts): MutableList<Any?>? {
-        val actualParameters: MutableList<Any?> = ArrayList()
-        val parameterAnnotations = method.getParameterAnnotations()
-        for (annotations in parameterAnnotations) {
-            if (annotations.size == 1) {
-                val factName: String = (annotations[0] as Fact).value() //validated upfront.
-                val fact = facts.get<Any?>(factName)
-                if (fact == null && !facts.asMap().containsKey(factName)) {
-                    throw NoSuchFactException(String.format("No fact named '%s' found in known facts: %n%s", factName, facts), factName)
-                }
-                actualParameters.add(fact)
+    private fun getActualParameters(method: Method, facts: Facts): List<Any> {
+        return method.parameterAnnotations.map {
+            if (it.size == 1) {
+                val factName: String = (it[0] as Fact).value
+                val fact = facts.get<Any>(factName) ?: throw NoSuchFactException("No fact named '$factName' found in known facts: %n$facts", factName)
+                fact
             } else {
-                actualParameters.add(facts) //validated upfront, there may be only one parameter not annotated and which is of type Facts.class
+                facts //validated upfront, there may be only one parameter not annotated and which is of type Facts.class
             }
         }
-        return actualParameters
-    }
+     }
 
     @Throws(Exception::class)
-    private fun equalsMethod(args: Array<Any?>?): Boolean {
-        if (args.get(0) !is org.jeasy.rules.api.Rule) {
+    private fun equalsMethod(args: Array<Any?>): Boolean {
+        if (args[0] !is org.jeasy.rules.api.Rule) {
             return false
         }
-        val otherRule = args.get(0) as org.jeasy.rules.api.Rule?
-        val otherPriority = otherRule.getPriority()
+        val otherRule = args[0] as org.jeasy.rules.api.Rule
+        val otherPriority = otherRule.priority
         val priority = getRulePriority()
         if (priority != otherPriority) {
             return false
         }
-        val otherName = otherRule.getName()
+        val otherName = otherRule.name
         val name = getRuleName()
         if (name != otherName) {
             return false
         }
-        val otherDescription = otherRule.getDescription()
+        val otherDescription = otherRule.description
         val description = getRuleDescription()
         return description == otherDescription
     }
@@ -151,26 +138,23 @@ class RuleProxy private constructor(private val target: Any) : InvocationHandler
         var result = getRuleName().hashCode()
         val priority = getRulePriority()
         val description = getRuleDescription()
-        result = 31 * result + (description?.hashCode() ?: 0)
+        result = 31 * result + (description.hashCode() ?: 0)
         result = 31 * result + priority
         return result
     }
 
     private fun getToStringMethod(): Method? {
-        if (toStringMethod == null) {
-            val methods = getMethods()
-            for (method in methods) {
-                if ("toString" == method.getName()) {
-                    toStringMethod = method
-                    return toStringMethod
-                }
+        val methods = getMethods()
+        for (method in methods) {
+            if ("toString" == method.name) {
+                return method
             }
         }
-        return toStringMethod
+        return null
     }
 
     @Throws(Exception::class)
-    private fun toStringMethod(): String? {
+    private fun toStringMethod(): String {
         val toStringMethod = getToStringMethod()
         return if (toStringMethod != null) {
             toStringMethod.invoke(target) as String
@@ -183,110 +167,67 @@ class RuleProxy private constructor(private val target: Any) : InvocationHandler
     private operator fun compareTo(otherRule: org.jeasy.rules.api.Rule): Int {
         val otherPriority = otherRule.priority
         val priority = getRulePriority()
-        return if (priority < otherPriority) {
-            -1
-        } else if (priority > otherPriority) {
-            1
-        } else {
-            val otherName = otherRule.name
-            val name = getRuleName()
-            name.compareTo(otherName)
+        return when {
+            priority < otherPriority -> -1
+            priority > otherPriority -> 1
+            else -> {
+                val otherName = otherRule.name
+                val name = getRuleName()
+                name.compareTo(otherName)
+            }
         }
     }
 
     @Throws(Exception::class)
     private fun getRulePriority(): Int {
-        if (priority == null) {
-            var priority: Int = org.jeasy.rules.api.Rule.Companion.DEFAULT_PRIORITY
-            val rule = getRuleAnnotation()
-            if (rule.priority != org.jeasy.rules.api.Rule.Companion.DEFAULT_PRIORITY) {
-                priority = rule.priority
+        var priority: Int = org.jeasy.rules.api.Rule.DEFAULT_PRIORITY
+        val rule = getRuleAnnotation()
+        if (rule.priority != org.jeasy.rules.api.Rule.DEFAULT_PRIORITY) {
+            priority = rule.priority
+        }
+        val methods = getMethods()
+        for (method in methods) {
+            if (method.isAnnotationPresent(Priority::class.java)) {
+                return method.invoke(target) as Int
             }
-            val methods = getMethods()
-            for (method in methods) {
-                if (method.isAnnotationPresent(Priority::class.java)) {
-                    priority = method.invoke(target) as Int
-                    break
-                }
-            }
-            this.priority = priority
         }
         return priority
     }
 
-    private fun getConditionMethod(): Method {
-        if (conditionMethod == null) {
-            val methods = getMethods()
-            for (method in methods) {
-                if (method.isAnnotationPresent(Condition::class.java)) {
-                    conditionMethod = method
-                    return conditionMethod
-                }
+    private fun getConditionMethod() = getMethods().firstOrNull {
+        it.isAnnotationPresent(Condition::class.java)
+    } ?: throw AnnotationNotFoundException(Condition::class.java, target::class.java)
+
+    private fun getActionMethodBeans() = getMethods()
+            .filter {
+                it.isAnnotationPresent(Action::class.java)
             }
-        }
-        return conditionMethod
-    }
-
-    private fun getActionMethodBeans(): MutableSet<ActionMethodOrderBean?>? {
-        if (actionMethods == null) {
-            actionMethods = TreeSet()
-            val methods = getMethods()
-            for (method in methods) {
-                if (method.isAnnotationPresent(Action::class.java)) {
-                    val actionAnnotation = method.getAnnotation(Action::class.java)
-                    val order: Int = actionAnnotation.order()
-                    actionMethods.add(ActionMethodOrderBean(method, order))
-                }
+            .map {
+                val actionAnnotation = it.getAnnotation(Action::class.java)
+                val order: Int = actionAnnotation.order
+                ActionMethodOrderBean(it, order)
             }
-        }
-        return actionMethods
+
+    private fun getCompareToMethod() = getMethods().firstOrNull {
+        it.name == "compareTo"
     }
 
-    private fun getCompareToMethod(): Method? {
-        if (compareToMethod == null) {
-            val methods = getMethods()
-            for (method in methods) {
-                if (method.getName() == "compareTo") {
-                    compareToMethod = method
-                    return compareToMethod
-                }
-            }
-        }
-        return compareToMethod
-    }
+    private fun getMethods() = getTargetClass().methods
 
-    private fun getMethods(): Array<Method> {
-        if (methods == null) {
-            methods = getTargetClass().getMethods()
-        }
-        return methods
-    }
-
-    private fun getRuleAnnotation(): Rule {
-        if (annotation == null) {
-            annotation = Utils.findAnnotation(Rule::class.java, getTargetClass())
-        }
-        return annotation
-    }
+    private fun getRuleAnnotation() = Utils.findAnnotation(Rule::class.java, getTargetClass())
 
     private fun getRuleName(): String {
-        if (name == null) {
-            val rule = getRuleAnnotation()
-            name = if (rule.name == org.jeasy.rules.api.Rule.DEFAULT_NAME) getTargetClass().getSimpleName() else rule.name()
-        }
-        return name
+        val rule = getRuleAnnotation()
+        return if (rule.name == DEFAULT_NAME) getTargetClass().simpleName else rule.name
     }
 
-    private fun getRuleDescription(): String? {
-        if (description == null) {
-            // Default description = "when " + conditionMethodName + " then " + comma separated actionMethodsNames
-            val description = StringBuilder()
-            appendConditionMethodName(description)
-            appendActionMethodsNames(description)
-            val rule = getRuleAnnotation()
-            this.description = if (rule.description == org.jeasy.rules.api.Rule.Companion.DEFAULT_DESCRIPTION) description.toString() else rule.description()
-        }
-        return description
+    private fun getRuleDescription(): String {
+        // Default description = "when " + conditionMethodName + " then " + comma separated actionMethodsNames
+        val description = StringBuilder()
+        appendConditionMethodName(description)
+        appendActionMethodsNames(description)
+        val rule = getRuleAnnotation()
+        return if (rule.description == org.jeasy.rules.api.Rule.DEFAULT_DESCRIPTION) description.toString() else rule.description
     }
 
     private fun appendConditionMethodName(description: StringBuilder) {
@@ -298,18 +239,14 @@ class RuleProxy private constructor(private val target: Any) : InvocationHandler
         }
     }
 
-    private fun appendActionMethodsNames(description: StringBuilder?) {
+    private fun appendActionMethodsNames(description: StringBuilder) {
         val iterator = getActionMethodBeans().iterator()
         while (iterator.hasNext()) {
-            description.append(iterator.next().getMethod().name)
+            description.append(iterator.next().method.name)
             if (iterator.hasNext()) {
                 description.append(",")
             }
         }
-    }
-
-    fun getTarget(): Any {
-        return target
     }
 
     private fun getTargetClass(): Class<*> {
@@ -327,8 +264,7 @@ class RuleProxy private constructor(private val target: Any) : InvocationHandler
          * @return a proxy that implements the [Rule] interface.
          */
         fun asRule(rule: Any): org.jeasy.rules.api.Rule {
-            val result: org.jeasy.rules.api.Rule
-            result = if (rule is org.jeasy.rules.api.Rule) {
+            return if (rule is org.jeasy.rules.api.Rule) {
                 rule
             } else {
                 ruleDefinitionValidator.validateRuleDefinition(rule)
@@ -336,7 +272,6 @@ class RuleProxy private constructor(private val target: Any) : InvocationHandler
                         org.jeasy.rules.api.Rule::class.java.classLoader, arrayOf<Class<*>?>(org.jeasy.rules.api.Rule::class.java, Comparable::class.java),
                         RuleProxy(rule)) as org.jeasy.rules.api.Rule
             }
-            return result
         }
     }
 }

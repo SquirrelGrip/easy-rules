@@ -31,10 +31,11 @@ import org.mockito.Mockito
 
 class RuleListenerTest : AbstractTest() {
     @Mock
-    private val ruleListener1: RuleListener? = null
+    lateinit var ruleListener1: RuleListener
 
     @Mock
-    private val ruleListener2: RuleListener? = null
+    lateinit var ruleListener2: RuleListener
+
     @Before
     @Throws(Exception::class)
     override fun setup() {

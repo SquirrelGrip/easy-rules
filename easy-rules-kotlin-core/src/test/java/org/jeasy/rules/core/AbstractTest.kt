@@ -34,21 +34,19 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 abstract class AbstractTest {
     @Mock
-    protected var rule1: Rule? = null
-
+    lateinit var rule1: Rule
     @Mock
-    protected var rule2: Rule? = null
-
+    lateinit var rule2: Rule
     @Mock
-    protected var fact1: Any? = null
-
+    lateinit var fact1: Any
     @Mock
-    protected var fact2: Any? = null
-    protected var facts: Facts? = null
-    protected var rules: Rules? = null
-    protected var rulesEngine: DefaultRulesEngine? = null
+    lateinit var fact2: Any
+
+    lateinit var facts: Facts
+    lateinit var rules: Rules
+    lateinit var rulesEngine: DefaultRulesEngine
+
     @Before
-    @Throws(Exception::class)
     open fun setup() {
         facts = Facts()
         facts.put("fact1", fact1)

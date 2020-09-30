@@ -31,32 +31,24 @@ import java.lang.reflect.Method
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
 internal class ActionMethodOrderBean(
-        private val method: Method,
-        private val order: Int
+        val method: Method,
+        val order: Int
 ) : Comparable<ActionMethodOrderBean> {
-    fun getOrder(): Int {
-        return order
-    }
-
-    fun getMethod(): Method? {
-        return method
-    }
 
     override fun compareTo(actionMethodOrderBean: ActionMethodOrderBean): Int {
-        return if (order < actionMethodOrderBean.getOrder()) {
+        return if (order < actionMethodOrderBean.order) {
             -1
-        } else if (order > actionMethodOrderBean.getOrder()) {
+        } else if (order > actionMethodOrderBean.order) {
             1
         } else {
-            if (method == actionMethodOrderBean.getMethod()) 0 else 1
+            if (method == actionMethodOrderBean.method) 0 else 1
         }
     }
 
     override fun equals(o: Any?): Boolean {
         if (this === o) return true
         if (o !is ActionMethodOrderBean) return false
-        val that = o as ActionMethodOrderBean?
-        return if (order != that.order) false else method == that.method
+        return if (order != o.order) false else method == o.method
     }
 
     override fun hashCode(): Int {

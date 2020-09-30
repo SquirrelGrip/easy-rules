@@ -28,11 +28,19 @@ import org.jeasy.rules.api.Facts
 @Rule
 class AnnotatedRuleWithMultipleAnnotatedParametersAndOneParameterOfTypeFacts {
     @Condition
-    fun `when`(@Fact("fact1") fact1: Any?, @Fact("fact2") fact2: Any?, facts: Facts?): Boolean {
+    fun `when`(
+            @Fact("fact1") fact1: Any,
+            @Fact("fact2") fact2: Any,
+            facts: Facts
+    ): Boolean {
         return true
     }
 
     @Action
-    fun then(@Fact("fact1") fact1: Any?, @Fact("fact2") fact2: Any?, facts: Facts?) {
+    fun then(
+            @Fact("fact1") fact1: Any,
+            @Fact("fact2") fact2: Any,
+            facts: Facts
+    ) {
     }
 }

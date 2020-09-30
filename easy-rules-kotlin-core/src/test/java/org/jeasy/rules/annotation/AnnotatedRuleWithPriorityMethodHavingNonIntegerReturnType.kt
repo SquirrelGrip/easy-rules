@@ -41,7 +41,7 @@ class AnnotatedRuleWithPriorityMethodHavingNonIntegerReturnType {
     }
 
     @Priority
-    fun getPriority(): String? {
+    fun getPriority(): String {
         return "1"
     }
 }

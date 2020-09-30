@@ -34,7 +34,7 @@ public class BuzzRule {
 
     @Condition
     public boolean isBuzz(@Fact("number") Integer number) {
-        return number % 7 == 0;
+        return number % 5 == 0;
     }
 
     @Action

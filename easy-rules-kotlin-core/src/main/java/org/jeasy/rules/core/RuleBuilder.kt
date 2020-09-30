@@ -46,7 +46,7 @@ class RuleBuilder {
      * @param name of the rule
      * @return the builder instance
      */
-    fun name(name: String): RuleBuilder? {
+    fun name(name: String): RuleBuilder {
         this.name = name
         return this
     }
@@ -57,7 +57,7 @@ class RuleBuilder {
      * @param description of the rule
      * @return the builder instance
      */
-    fun description(description: String): RuleBuilder? {
+    fun description(description: String): RuleBuilder {
         this.description = description
         return this
     }
@@ -68,7 +68,7 @@ class RuleBuilder {
      * @param priority of the rule
      * @return the builder instance
      */
-    fun priority(priority: Int): RuleBuilder? {
+    fun priority(priority: Int): RuleBuilder {
         this.priority = priority
         return this
     }

@@ -34,7 +34,7 @@ public class FizzRule {
 
     @Condition
     public boolean isFizz(@Fact("number") Integer number) {
-        return number % 5 == 0;
+        return number % 3 == 0;
     }
 
     @Action

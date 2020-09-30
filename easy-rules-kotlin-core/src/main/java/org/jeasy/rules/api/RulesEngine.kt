@@ -29,30 +29,12 @@ package org.jeasy.rules.api
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
 interface RulesEngine {
-    /**
-     * Return the rules engine parameters.
-     *
-     * @return The rules engine parameters
-     */
-    fun getParameters(): RulesEngineParameters
 
-    /**
-     * Return the list of registered rule listeners.
-     *
-     * @return the list of registered rule listeners
-     */
-    fun getRuleListeners(): List<RuleListener> {
-        return listOf()
-    }
+    val parameters: RulesEngineParameters
 
-    /**
-     * Return the list of registered rules engine listeners.
-     *
-     * @return the list of registered rules engine listeners
-     */
-    fun getRulesEngineListeners(): List<RulesEngineListener> {
-        return listOf()
-    }
+    val ruleListeners: List<RuleListener>
+
+    val rulesEngineListeners: List<RulesEngineListener>
 
     /**
      * Fire all registered rules on given facts.

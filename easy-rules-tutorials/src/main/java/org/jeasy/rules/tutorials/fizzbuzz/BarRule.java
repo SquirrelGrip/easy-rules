@@ -21,27 +21,25 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  */
-package org.jeasy.rules.annotation
+package org.jeasy.rules.tutorials.fizzbuzz;
 
-import org.jeasy.rules.api.Facts
+import org.jeasy.rules.annotation.*;
 
 @Rule
-class AnnotatedRuleWithMultipleAnnotatedParametersAndOneParameterOfSubTypeFacts {
+public class BarRule {
+
     @Condition
-    fun `when`(
-            @Fact("fact1") fact1: Any,
-            @Fact("fact2") fact2: Any,
-            facts: SubFacts
-    ): Boolean {
-        return true
+    public boolean isBuzz(@Fact("number") Integer number) {
+        return number % 11 == 0;
     }
 
     @Action
-    fun then(
-            @Fact("fact1") fact1: Any,
-            @Fact("fact2") fact2: Any,
-            facts: SubFacts) {
+    public void printBuzz() {
+        System.out.print("bar");
     }
 
-    class SubFacts : Facts()
+    @Priority
+    public int getPriority() {
+        return 4;
+    }
 }

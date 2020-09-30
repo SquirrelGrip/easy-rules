@@ -124,7 +124,7 @@ class RuleProxyTest {
     @Test
     fun testCompareTo() {
         @org.jeasy.rules.annotation.Rule
-        internal class MyComparableRule(var comparisonCriteria: Int) : Comparable<MyComparableRule?> {
+        class MyComparableRule(var comparisonCriteria: Int) : Comparable<MyComparableRule> {
             @Condition
             fun `when`(): Boolean {
                 return true
@@ -134,7 +134,7 @@ class RuleProxyTest {
             fun then() {
             }
 
-            override fun compareTo(otherRule: MyComparableRule?): Int {
+            override fun compareTo(otherRule: MyComparableRule): Int {
                 return Integer.compare(comparisonCriteria, otherRule.comparisonCriteria)
             }
         }
@@ -163,7 +163,7 @@ class RuleProxyTest {
     @Test(expected = IllegalArgumentException::class)
     fun testCompareToWithIncorrectSignature() {
         @org.jeasy.rules.annotation.Rule
-        internal class InvalidComparableRule {
+        class InvalidComparableRule {
             @Condition
             fun `when`(): Boolean {
                 return true
@@ -186,7 +186,7 @@ class RuleProxyTest {
     @Test
     fun testPriorityFromAnnotation() {
         @org.jeasy.rules.annotation.Rule(priority = 1)
-        internal class MyRule {
+        class MyRule {
             @Condition
             fun `when`(): Boolean {
                 return true
@@ -205,7 +205,7 @@ class RuleProxyTest {
     @Test
     fun testPriorityFromMethod() {
         @org.jeasy.rules.annotation.Rule
-        internal class MyRule {
+        class MyRule {
             @Condition
             fun `when`(): Boolean {
                 return true
@@ -229,7 +229,7 @@ class RuleProxyTest {
     @Test
     fun testPriorityPrecedence() {
         @org.jeasy.rules.annotation.Rule(priority = 1)
-        internal class MyRule {
+        class MyRule {
             @Condition
             fun `when`(): Boolean {
                 return true
@@ -253,7 +253,7 @@ class RuleProxyTest {
     @Test
     fun testDefaultPriority() {
         @org.jeasy.rules.annotation.Rule
-        internal class MyRule {
+        class MyRule {
             @Condition
             fun `when`(): Boolean {
                 return true

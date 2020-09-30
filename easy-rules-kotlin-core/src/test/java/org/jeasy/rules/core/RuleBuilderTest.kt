@@ -35,13 +35,14 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class RuleBuilderTest {
     @Mock
-    private val condition: Condition? = null
+    lateinit var condition: Condition
 
     @Mock
-    private val action1: Action? = null
+    lateinit var action1: Action
 
     @Mock
-    private val action2: Action? = null
+    lateinit var action2: Action
+
     @Test
     fun testDefaultRuleCreationWithDefaultValues() {
         // when

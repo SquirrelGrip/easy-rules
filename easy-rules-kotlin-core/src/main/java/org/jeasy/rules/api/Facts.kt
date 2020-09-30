@@ -24,6 +24,7 @@
 package org.jeasy.rules.api
 
 import java.util.*
+import kotlin.Comparator
 
 /**
  * This class encapsulates a set of facts and represents a facts namespace.
@@ -32,7 +33,7 @@ import java.util.*
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
 open class Facts : Iterable<Fact<*>> {
-    private val facts: MutableSet<Fact<*>> = mutableSetOf()
+    private val facts: MutableSet<Fact<*>> = sortedSetOf()
 
     /**
      * Add a fact, replacing any fact with the same name.
@@ -40,9 +41,7 @@ open class Facts : Iterable<Fact<*>> {
      * @param name of the fact to add, must not be null
      * @param value of the fact to add, must not be null
      */
-    fun <T> put(name: String, value: T) {
-        val retrievedFact = getFact(name)
-        retrievedFact?.let { remove(it) }
+    fun put(name: String, value: Any) {
         add(Fact(name, value))
     }
 
@@ -52,8 +51,7 @@ open class Facts : Iterable<Fact<*>> {
      * @param fact to add, must not be null
      */
     fun <T> add(fact: Fact<T>) {
-        Objects.requireNonNull(fact, "fact must not be null")
-        val retrievedFact = getFact(fact.getName())
+        val retrievedFact = getFact(fact.name)
         retrievedFact?.let { remove(it) }
         facts.add(fact)
     }
@@ -99,25 +97,21 @@ open class Facts : Iterable<Fact<*>> {
      * @param factName name of the fact, must not be null
      * @return the fact having the given name, or null if there is no fact with the given name
      */
-    fun getFact(factName: String): Fact<*>? {
-        return facts
-                .firstOrNull {
-                    fact: Fact<*> -> fact.getName() == factName
-                }
-    }
+    fun getFact(factName: String): Fact<*>? = facts
+            .firstOrNull {
+                fact: Fact<*> -> fact.name == factName
+            }
 
     /**
      * Return a copy of the facts as a map. It is not intended to manipulate
      * facts outside of the rules engine (aka other than manipulating them through rules).
      *
-     * @return a copy of the current facts as a [HashMap]
+     * @return a copy of the current facts as a [Map]
      */
-    fun asMap(): MutableMap<String?, Any?>? {
-        val map: MutableMap<String?, Any?> = HashMap()
-        for (fact in facts) {
-            map[fact.getName()] = fact.getValue()
-        }
-        return map
+    fun asMap(): Map<String, Any?> {
+        return facts.map {
+            it.name to it.value
+        }.toMap()
     }
 
     /**

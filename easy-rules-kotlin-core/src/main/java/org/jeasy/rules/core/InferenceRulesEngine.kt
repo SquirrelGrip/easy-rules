@@ -36,14 +36,16 @@ import java.util.*
  *
  * @author Mahmoud Ben Hassine (mahmoud.benhassine@icloud.com)
  */
-class InferenceRulesEngine @JvmOverloads constructor(parameters: RulesEngineParameters? = RulesEngineParameters()) : AbstractRulesEngine(parameters) {
+class InferenceRulesEngine(
+        parameters: RulesEngineParameters = RulesEngineParameters()
+) : AbstractRulesEngine(parameters) {
     private val delegate: DefaultRulesEngine
     override fun fire(rules: Rules, facts: Facts) {
-        var selectedRules: MutableSet<Rule?>?
+        var selectedRules: MutableSet<Rule>
         do {
             LOGGER.debug("Selecting candidate rules based on the following facts: {}", facts)
             selectedRules = selectCandidates(rules, facts)
-            if (!selectedRules.isEmpty()) {
+            if (selectedRules.isNotEmpty()) {
                 delegate.fire(Rules(selectedRules), facts)
             } else {
                 LOGGER.debug("No candidate rules found for facts: {}", facts)
@@ -51,8 +53,8 @@ class InferenceRulesEngine @JvmOverloads constructor(parameters: RulesEnginePara
         } while (!selectedRules.isEmpty())
     }
 
-    private fun selectCandidates(rules: Rules, facts: Facts): MutableSet<Rule?>? {
-        val candidates: MutableSet<Rule?> = TreeSet()
+    private fun selectCandidates(rules: Rules, facts: Facts): MutableSet<Rule> {
+        val candidates: MutableSet<Rule> = sortedSetOf()
         for (rule in rules) {
             if (rule.evaluate(facts)) {
                 candidates.add(rule)
@@ -61,7 +63,7 @@ class InferenceRulesEngine @JvmOverloads constructor(parameters: RulesEnginePara
         return candidates
     }
 
-    override fun check(rules: Rules, facts: Facts): MutableMap<Rule, Boolean> {
+    override fun check(rules: Rules, facts: Facts): Map<Rule, Boolean> {
         return delegate.check(rules, facts)
     }
 
@@ -69,7 +71,7 @@ class InferenceRulesEngine @JvmOverloads constructor(parameters: RulesEnginePara
      * Register a rule listener.
      * @param ruleListener to register
      */
-    override fun registerRuleListener(ruleListener: RuleListener?) {
+    override fun registerRuleListener(ruleListener: RuleListener) {
         super.registerRuleListener(ruleListener)
         delegate.registerRuleListener(ruleListener)
     }
@@ -78,7 +80,7 @@ class InferenceRulesEngine @JvmOverloads constructor(parameters: RulesEnginePara
      * Register a list of rule listener.
      * @param ruleListeners to register
      */
-    override fun registerRuleListeners(ruleListeners: MutableList<RuleListener?>?) {
+    override fun registerRuleListeners(ruleListeners: List<RuleListener>) {
         super.registerRuleListeners(ruleListeners)
         delegate.registerRuleListeners(ruleListeners)
     }
@@ -87,7 +89,7 @@ class InferenceRulesEngine @JvmOverloads constructor(parameters: RulesEnginePara
      * Register a rules engine listener.
      * @param rulesEngineListener to register
      */
-    override fun registerRulesEngineListener(rulesEngineListener: RulesEngineListener?) {
+    override fun registerRulesEngineListener(rulesEngineListener: RulesEngineListener) {
         super.registerRulesEngineListener(rulesEngineListener)
         delegate.registerRulesEngineListener(rulesEngineListener)
     }
@@ -96,7 +98,7 @@ class InferenceRulesEngine @JvmOverloads constructor(parameters: RulesEnginePara
      * Register a list of rules engine listener.
      * @param rulesEngineListeners to register
      */
-    override fun registerRulesEngineListeners(rulesEngineListeners: MutableList<RulesEngineListener?>?) {
+    override fun registerRulesEngineListeners(rulesEngineListeners: List<RulesEngineListener>) {
         super.registerRulesEngineListeners(rulesEngineListeners)
         delegate.registerRulesEngineListeners(rulesEngineListeners)
     }

@@ -36,5 +36,5 @@ fun interface Action {
      * @throws Exception when unable to execute the action
      */
     @Throws(Exception::class)
-    fun execute(facts: Facts?)
+    fun execute(facts: Facts)
 }

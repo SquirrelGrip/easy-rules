@@ -36,7 +36,7 @@ public class NonFizzBuzzRule {
     public boolean isNotFizzNorBuzz(@Fact("number") Integer number) {
         // can return true, because this is the latest rule to trigger according to assigned priorities
         // and in which case, the number is not fizz nor buzz
-        return number % 5 != 0 || number % 7 != 0;
+        return !(number % 3 == 0 || number % 5 == 0 || number % 7 == 0 || number % 11 == 0);
     }
 
     @Action
@@ -46,6 +46,6 @@ public class NonFizzBuzzRule {
 
     @Priority
     public int getPriority() {
-        return 3;
+        return 5;
     }
 }

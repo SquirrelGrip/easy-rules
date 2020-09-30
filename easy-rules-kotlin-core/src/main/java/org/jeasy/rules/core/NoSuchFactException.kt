@@ -23,8 +23,7 @@
  */
 package org.jeasy.rules.core
 
-internal class NoSuchFactException(message: String?, private val missingFact: String?) : RuntimeException(message) {
-    fun getMissingFact(): String? {
-        return missingFact
-    }
-}
+internal class NoSuchFactException(
+        message: String,
+        val missingFact: String
+) : RuntimeException(message)

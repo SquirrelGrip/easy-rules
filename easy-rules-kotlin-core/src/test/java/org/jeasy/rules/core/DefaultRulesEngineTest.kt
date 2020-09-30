@@ -40,11 +40,12 @@ import org.mockito.Mockito
 
 class DefaultRulesEngineTest : AbstractTest() {
     @Mock
-    private val ruleListener: RuleListener? = null
-
+    lateinit var ruleListener: RuleListener
     @Mock
-    private val rulesEngineListener: RulesEngineListener? = null
-    private var annotatedRule: AnnotatedRule? = null
+    lateinit var rulesEngineListener: RulesEngineListener
+
+    lateinit var annotatedRule: AnnotatedRule
+
     @Before
     @Throws(Exception::class)
     override fun setup() {
@@ -203,7 +204,7 @@ class DefaultRulesEngineTest : AbstractTest() {
         val rulesEngine = DefaultRulesEngine(parameters)
 
         // When
-        val engineParameters = rulesEngine.getParameters()
+        val engineParameters = rulesEngine.parameters
 
         // Then
         Assertions.assertThat(engineParameters).isNotSameAs(parameters)
@@ -217,7 +218,7 @@ class DefaultRulesEngineTest : AbstractTest() {
         rulesEngine.registerRuleListener(ruleListener)
 
         // When
-        val ruleListeners = rulesEngine.getRuleListeners()
+        val ruleListeners = rulesEngine.ruleListeners
 
         // Then
         Assertions.assertThat(ruleListeners).contains(ruleListener)
@@ -230,7 +231,7 @@ class DefaultRulesEngineTest : AbstractTest() {
         rulesEngine.registerRuleListener(ruleListener)
 
         // When
-        val ruleListeners = rulesEngine.getRuleListeners()
+        val ruleListeners = rulesEngine.ruleListeners
 
         // Then
         Assertions.assertThatThrownBy { ruleListeners.clear() }.isInstanceOf(UnsupportedOperationException::class.java)
@@ -243,7 +244,7 @@ class DefaultRulesEngineTest : AbstractTest() {
         rulesEngine.registerRulesEngineListener(rulesEngineListener)
 
         // When
-        val rulesEngineListeners = rulesEngine.getRulesEngineListeners()
+        val rulesEngineListeners = rulesEngine.rulesEngineListeners
 
         // Then
         Assertions.assertThat(rulesEngineListeners).contains(rulesEngineListener)
@@ -256,7 +257,7 @@ class DefaultRulesEngineTest : AbstractTest() {
         rulesEngine.registerRulesEngineListener(rulesEngineListener)
 
         // When
-        val rulesEngineListeners = rulesEngine.getRulesEngineListeners()
+        val rulesEngineListeners = rulesEngine.rulesEngineListeners
 
         // Then
         Assertions.assertThatThrownBy { rulesEngineListeners.clear() }.isInstanceOf(UnsupportedOperationException::class.java)

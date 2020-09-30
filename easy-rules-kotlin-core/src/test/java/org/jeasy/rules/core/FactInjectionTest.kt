@@ -53,9 +53,9 @@ class FactInjectionTest {
         rulesEngine.fire(rules, facts)
 
         // Then
-        Assertions.assertThat(rule.getFact1()).isSameAs(fact1)
-        Assertions.assertThat(rule.getFact2()).isSameAs(fact2)
-        Assertions.assertThat(rule.getFacts()).isSameAs(facts)
+        Assertions.assertThat(rule.fact1).isSameAs(fact1)
+        Assertions.assertThat(rule.fact2).isSameAs(fact2)
+        Assertions.assertThat(rule.facts).isSameAs(facts)
     }
 
     @Test
@@ -124,33 +124,26 @@ class FactInjectionTest {
     }
 
     @Rule
-    internal class DummyRule {
-        private var fact1: Any? = null
-        private var fact2: Any? = null
-        private var facts: Facts? = null
+    class DummyRule {
+        lateinit var fact1: Any
+        lateinit var fact2: Any
+        lateinit var facts: Facts
+
         @Condition
-        fun `when`(@Fact("fact1") fact1: Any?, @Fact("fact2") fact2: Any?): Boolean {
+        fun `when`(
+                @Fact("fact1") fact1: Any,
+                @Fact("fact2") fact2: Any
+        ): Boolean {
             this.fact1 = fact1
             this.fact2 = fact2
             return true
         }
 
         @Action
-        fun then(facts: Facts?) {
+        fun then(facts: Facts) {
             this.facts = facts
         }
 
-        fun getFact1(): Any? {
-            return fact1
-        }
-
-        fun getFact2(): Any? {
-            return fact2
-        }
-
-        fun getFacts(): Facts? {
-            return facts
-        }
     }
 
     @Rule
@@ -199,7 +192,7 @@ class FactInjectionTest {
         }
 
         @Action
-        fun takeAnUmbrella(facts: Facts?) {
+        fun takeAnUmbrella(facts: Facts) {
             println("It rains, take an umbrella!")
             isExecuted = true
         }
